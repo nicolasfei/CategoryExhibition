@@ -1,4 +1,4 @@
-package com.nicolas.categoryexhibition;
+package com.nicolas.categoryexhibition.component;
 
 import android.content.Context;
 import android.net.Uri;
@@ -8,15 +8,18 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.nicolas.categoryexhibition.R;
+import com.nicolas.categoryexhibition.data.Node;
+import com.nicolas.categoryexhibition.data.NodeAttr;
 
 import java.util.List;
 
 public class HomeItemAdapter extends BaseAdapter {
 
     private Context context;
-    private List<CategoryBean.DataBean.DataListBean> foodDatas;
+    private List<Node> foodDatas;
 
-    public HomeItemAdapter(Context context, List<CategoryBean.DataBean.DataListBean> foodDatas) {
+    public HomeItemAdapter(Context context, List<Node> foodDatas) {
         this.context = context;
         this.foodDatas = foodDatas;
     }
@@ -24,16 +27,12 @@ public class HomeItemAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if (foodDatas != null) {
-            return foodDatas.size();
-        } else {
-            return 10;
-        }
+        return foodDatas == null ? 0 : foodDatas.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return foodDatas.size();
+        return foodDatas == null ? null : foodDatas.size();
     }
 
     @Override
@@ -41,10 +40,9 @@ public class HomeItemAdapter extends BaseAdapter {
         return position;
     }
 
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        CategoryBean.DataBean.DataListBean subcategory = foodDatas.get(position);
+        NodeAttr subcategory = foodDatas.get(position).getAttr();
         ViewHold viewHold = null;
         if (convertView == null) {
             convertView = View.inflate(context, R.layout.item_home_category, null);
@@ -55,12 +53,10 @@ public class HomeItemAdapter extends BaseAdapter {
         } else {
             viewHold = (ViewHold) convertView.getTag();
         }
-        viewHold.tv_name.setText(subcategory.getTitle());
+        viewHold.tv_name.setText(subcategory.getName());
         Uri uri = Uri.parse(subcategory.getImgURL());
         viewHold.iv_icon.setImageURI(uri);
         return convertView;
-
-
     }
 
     private static class ViewHold {

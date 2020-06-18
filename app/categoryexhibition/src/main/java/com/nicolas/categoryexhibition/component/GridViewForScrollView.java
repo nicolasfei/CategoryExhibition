@@ -1,4 +1,4 @@
-package com.nicolas.categoryexhibition;
+package com.nicolas.categoryexhibition.component;
 
 import android.content.Context;
 import android.util.AttributeSet;

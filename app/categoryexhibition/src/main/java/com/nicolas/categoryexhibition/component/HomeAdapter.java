@@ -1,10 +1,13 @@
-package com.nicolas.categoryexhibition;
+package com.nicolas.categoryexhibition.component;
 
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.nicolas.categoryexhibition.R;
+import com.nicolas.categoryexhibition.data.Node;
 
 import java.util.List;
 
@@ -16,9 +19,9 @@ import java.util.List;
 public class HomeAdapter extends BaseAdapter {
 
     private Context context;
-    private List<CategoryBean.DataBean> foodDatas;
+    private List<Node> foodDatas;
 
-    public HomeAdapter(Context context, List<CategoryBean.DataBean> foodDatas) {
+    public HomeAdapter(Context context, List<Node> foodDatas) {
         this.context = context;
         this.foodDatas = foodDatas;
     }
@@ -45,20 +48,18 @@ public class HomeAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        CategoryBean.DataBean dataBean = foodDatas.get(position);
-        List<CategoryBean.DataBean.DataListBean> dataList = dataBean.getDataList();
+        Node dataBean = foodDatas.get(position);
+        List<Node> dataList = dataBean.getSub();
         ViewHold viewHold = null;
         if (convertView == null) {
             convertView = View.inflate(context, R.layout.item_home, null);
-            viewHold = new ViewHold();
-            viewHold.gridView = (GridViewForScrollView) convertView.findViewById(R.id.gridView);
-            viewHold.blank = (TextView) convertView.findViewById(R.id.blank);
+            viewHold = new ViewHold(convertView);
             convertView.setTag(viewHold);
         } else {
             viewHold = (ViewHold) convertView.getTag();
         }
         HomeItemAdapter adapter = new HomeItemAdapter(context, dataList);
-        viewHold.blank.setText(dataBean.getModuleTitle());
+        viewHold.blank.setText(dataBean.getAttr().getName());
         viewHold.gridView.setAdapter(adapter);
         return convertView;
     }
@@ -66,5 +67,10 @@ public class HomeAdapter extends BaseAdapter {
     private static class ViewHold {
         private GridViewForScrollView gridView;
         private TextView blank;
+
+        private ViewHold(View root) {
+            this.gridView = root.findViewById(R.id.gridView);
+            this.blank = root.findViewById(R.id.blank);
+        }
     }
 }

@@ -13,6 +13,9 @@ import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONObject;
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.nicolas.categoryexhibition.component.CategoryBean;
+import com.nicolas.categoryexhibition.component.HomeAdapter;
+import com.nicolas.categoryexhibition.component.MenuAdapter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
