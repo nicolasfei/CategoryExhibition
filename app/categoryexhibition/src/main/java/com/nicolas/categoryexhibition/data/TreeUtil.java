@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TreeUtil {
-    public static List<GoodsClassNode> buildTree(List<GoodsClassNode> nodes) {
-        Map<Integer, List<GoodsClassNode>> sub = nodes.stream().filter(node -> node.getPid() != 0).collect(Collectors.groupingBy(node -> node.getPid()));
-        nodes.forEach(node -> node.setSub(sub.get(node.getId())));
-        return nodes.stream().filter(node -> node.getPid() == 0).collect(Collectors.toList());
+    public static List<Node> buildTree(List<Node> nodes) {
+        Map<Integer, List<Node>> sub = nodes.stream().filter(node -> node.getAttr().getPid() != 0).collect(Collectors.groupingBy(node -> node.getAttr().getPid()));
+        nodes.forEach(node -> node.setSub(sub.get(node.getAttr().getId())));
+        return nodes.stream().filter(node -> node.getAttr().getPid() == 0).collect(Collectors.toList());
     }
 }

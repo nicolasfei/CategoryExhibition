@@ -50,7 +50,7 @@ public class HomeAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         Node dataBean = foodDatas.get(position);
         List<Node> dataList = dataBean.getSub();
-        ViewHold viewHold = null;
+        ViewHold viewHold;
         if (convertView == null) {
             convertView = View.inflate(context, R.layout.item_home, null);
             viewHold = new ViewHold(convertView);

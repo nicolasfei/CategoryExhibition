@@ -5,9 +5,11 @@ import android.net.Uri;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.google.android.material.chip.Chip;
 import com.nicolas.categoryexhibition.R;
 import com.nicolas.categoryexhibition.data.Node;
 import com.nicolas.categoryexhibition.data.NodeAttr;
@@ -43,24 +45,27 @@ public class HomeItemAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         NodeAttr subcategory = foodDatas.get(position).getAttr();
-        ViewHold viewHold = null;
+        ViewHold viewHold;
         if (convertView == null) {
             convertView = View.inflate(context, R.layout.item_home_category, null);
-            viewHold = new ViewHold();
-            viewHold.tv_name = (TextView) convertView.findViewById(R.id.item_home_name);
-            viewHold.iv_icon = (SimpleDraweeView) convertView.findViewById(R.id.item_album);
+            viewHold = new ViewHold(convertView);
             convertView.setTag(viewHold);
         } else {
             viewHold = (ViewHold) convertView.getTag();
         }
-        viewHold.tv_name.setText(subcategory.getName());
+        viewHold.chip.setText(subcategory.getName());
         Uri uri = Uri.parse(subcategory.getImgURL());
-        viewHold.iv_icon.setImageURI(uri);
+//        viewHold.iv_icon.setImageURI(uri);
         return convertView;
     }
 
     private static class ViewHold {
-        private TextView tv_name;
-        private SimpleDraweeView iv_icon;
+//        private TextView tv_name;
+//        private SimpleDraweeView iv_icon;
+        private CheckBox chip;
+
+        private ViewHold(View root){
+            this.chip = root.findViewById(R.id.chip);
+        }
     }
 }

@@ -2,6 +2,7 @@ package com.nicolas.categoryexhibition;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
@@ -9,6 +10,7 @@ import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -25,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CategoryExhibition extends Dialog {
+
+    private final static String TAG = "CategoryExhibition";
 
     private Context context;
     private List<Node> tree;        //树结构
@@ -69,9 +73,9 @@ public class CategoryExhibition extends Dialog {
         Window window = mCategoryDialog.getWindow();
         if (window != null) {
             WindowManager.LayoutParams lp = window.getAttributes();
-            lp.gravity = Gravity.START;
+            lp.gravity = Gravity.BOTTOM;
             lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-            lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+            lp.height = WindowManager.LayoutParams.MATCH_PARENT;
             window.setAttributes(lp);
         }
         //根数据
@@ -105,7 +109,7 @@ public class CategoryExhibition extends Dialog {
                     return;
                 }
                 int current = showTitle.indexOf(firstVisibleItem);
-//				lv_home.setSelection(current);
+                homeView.setSelection(current);
                 if (currentItem != current && current >= 0) {
                     currentItem = current;
                     menuTitle.setText(menuData.get(currentItem).getName());
@@ -116,15 +120,29 @@ public class CategoryExhibition extends Dialog {
         });
 
         //设置menu和home的联动
-        menuView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        menuAdapter.setOnMenuItemClickListener(new MenuAdapter.OnMenuItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            public void onChoiceChanged(int position, CompoundButton buttonView, boolean isChecked) {
+
+            }
+
+            @Override
+            public void onClick(int position, View v) {
                 menuAdapter.setSelectItem(position);
                 menuAdapter.notifyDataSetInvalidated();
                 menuTitle.setText(menuData.get(position).getName());
-                menuView.setSelection(showTitle.get(position));
+                homeView.setSelection(showTitle.get(position));
             }
         });
+//        menuView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                menuAdapter.setSelectItem(position);
+//                menuAdapter.notifyDataSetInvalidated();
+//                menuTitle.setText(menuData.get(position).getName());
+//                menuView.setSelection(showTitle.get(position));
+//            }
+//        });
 
         //设置树分支数据选择
         rootView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -173,19 +191,31 @@ public class CategoryExhibition extends Dialog {
         if (this.tree == null) {
             return;
         }
-        for (Node node : this.tree) {
+
+        Log.d(TAG, "initData: " + this.tree.size());
+        List<Node> level1 = this.tree.get(0).getSub();
+        Log.d(TAG, "initData: level1 size is " + level1.size());
+        for (Node node : level1) {
+            Log.d(TAG, "initData: root add " + node.getAttr().getName());
             this.rootData.add(node.getAttr());      //一层
             this.rootAdapter.notifyDataSetChanged();
         }
 
-        if (this.tree.size() > 0) {
-            Node nodeL2 = this.tree.get(0);             //默认加载第一个节点的数据
-            for (Node nodeL3 : nodeL2.getSub()) {       //二层
-                this.menuData.add(nodeL3.getAttr());
+        if (level1.size() > 0) {
+            Node nodeL1 = level1.get(0);             //默认加载第一个节点的数据
+            Log.d(TAG, "initData: level1 name is " + nodeL1.getAttr().getName() + "size is " + nodeL1.getSub().size());
+            int i = 0;
+            if (this.showTitle == null) {
+                this.showTitle = new ArrayList<>();
+            }
+            for (Node nodeL2 : nodeL1.getSub()) {       //二层
+                Log.d(TAG, "initData: menuData add " + nodeL2.getAttr().getName());
+                this.menuData.add(nodeL2.getAttr());
+                this.homeData.add(nodeL2);              //三层
+                this.showTitle.add(i);
+                i++;
             }
             this.menuAdapter.notifyDataSetChanged();
-
-            this.homeData.add(nodeL2);                  //三层
             this.homeAdapter.notifyDataSetChanged();
         }
     }
@@ -193,6 +223,10 @@ public class CategoryExhibition extends Dialog {
     public void setTreeData(List<Node> tree) {
         this.tree = tree;
         this.initData();
+    }
+
+    public void show() {
+        this.mCategoryDialog.show();
     }
 
     public void setOnCategoryChoiceListener(OnCategoryChoiceListener listener) {
