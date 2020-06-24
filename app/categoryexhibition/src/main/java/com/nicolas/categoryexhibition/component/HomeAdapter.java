@@ -1,6 +1,7 @@
 package com.nicolas.categoryexhibition.component;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -17,9 +18,10 @@ import java.util.List;
  * @author brush
  */
 public class HomeAdapter extends BaseAdapter {
-
+    private static final String TAG = "HomeAdapter";
     private Context context;
     private List<Node> foodDatas;
+    private OnSubNodeChoiceListener listener;
 
     public HomeAdapter(Context context, List<Node> foodDatas) {
         this.context = context;
@@ -49,7 +51,7 @@ public class HomeAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Node dataBean = foodDatas.get(position);
-        List<Node> dataList = dataBean.getSub();
+        List<Node> dataList = dataBean.getSub();        //叶子节点List
         ViewHold viewHold;
         if (convertView == null) {
             convertView = View.inflate(context, R.layout.item_home, null);
@@ -59,6 +61,45 @@ public class HomeAdapter extends BaseAdapter {
             viewHold = (ViewHold) convertView.getTag();
         }
         HomeItemAdapter adapter = new HomeItemAdapter(context, dataList);
+        adapter.setOnItemChoiceListener(new HomeItemAdapter.OnItemChoiceListener() {
+            @Override
+            public void OnItemChoice(Node node, boolean isChoice) {
+                //找到父节点
+                Node fNode = null;
+                for (Node item : foodDatas) {
+                    if (item.getAttr().getId() == node.getAttr().getPid()) {
+                        fNode = item;
+                        break;
+                    }
+                }
+                if (fNode != null) {
+                    if (isChoice) {
+                        boolean isAllChoice = true;
+                        //判断是否其他子节点都被选中了
+                        for (Node item : fNode.getSub()) {
+                            if (item.getStatus() != ChoiceStatus.All) {
+                                isAllChoice = false;
+                                break;
+                            }
+                        }
+                        fNode.setStatus(isAllChoice ? ChoiceStatus.All : ChoiceStatus.Part);
+                    } else {
+                        boolean isAllNone = true;
+                        //判断是否其他子节点都没有被选中
+                        for (Node item : fNode.getSub()) {
+                            if (item.getStatus() != ChoiceStatus.None) {
+                                isAllNone = false;
+                                break;
+                            }
+                        }
+                        fNode.setStatus(isAllNone ? ChoiceStatus.None : ChoiceStatus.Part);
+                    }
+                }
+                if (listener != null) {
+                    listener.OnSubNodeChoice(node, isChoice);
+                }
+            }
+        });
         viewHold.blank.setText(dataBean.getAttr().getName());
         viewHold.gridView.setAdapter(adapter);
         return convertView;
@@ -72,5 +113,13 @@ public class HomeAdapter extends BaseAdapter {
             this.gridView = root.findViewById(R.id.gridView);
             this.blank = root.findViewById(R.id.blank);
         }
+    }
+
+    public void setOnSubNodeChoiceListener(OnSubNodeChoiceListener listener) {
+        this.listener = listener;
+    }
+
+    public interface OnSubNodeChoiceListener {
+        void OnSubNodeChoice(Node node, boolean isChoice);
     }
 }

@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.nicolas.categoryexhibition.R;
+import com.nicolas.categoryexhibition.data.Node;
 import com.nicolas.categoryexhibition.data.NodeAttr;
 
 import java.util.List;
@@ -15,9 +16,9 @@ import java.util.List;
 public class RootAdapter extends BaseAdapter {
 
     private Context context;
-    private List<NodeAttr> attrs;
+    private List<Node> attrs;
 
-    public RootAdapter(Context context, List<NodeAttr> attrs) {
+    public RootAdapter(Context context, List<Node> attrs) {
         this.context = context;
         this.attrs = attrs;
     }
@@ -48,7 +49,7 @@ public class RootAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        NodeAttr attr = this.attrs.get(position);
+        NodeAttr attr = this.attrs.get(position).getAttr();
         holder.textView.setText(attr.getName());
 
         return convertView;

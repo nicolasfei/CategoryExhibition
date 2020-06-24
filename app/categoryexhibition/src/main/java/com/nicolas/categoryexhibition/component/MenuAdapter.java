@@ -6,13 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.google.android.material.chip.Chip;
 import com.nicolas.categoryexhibition.R;
-import com.nicolas.categoryexhibition.data.NodeAttr;
+import com.nicolas.categoryexhibition.data.Node;
 
 import java.util.List;
 
@@ -20,9 +18,9 @@ public class MenuAdapter extends BaseAdapter {
 
     private Context context;
     private int selectItem = 0;
-    private List<NodeAttr> list;
+    private List<Node> list;
 
-    public MenuAdapter(Context context, List<NodeAttr> list) {
+    public MenuAdapter(Context context, List<Node> list) {
         this.list = list;
         this.context = context;
     }
@@ -67,7 +65,10 @@ public class MenuAdapter extends BaseAdapter {
             holder.tv_name.setBackgroundColor(Color.GREEN);
             holder.tv_name.setTextColor(Color.BLACK);
         }
-        holder.tv_name.setText(list.get(position).getName());
+
+        final Node node = list.get(position);
+
+        holder.tv_name.setText(node.getAttr().getName());
         holder.tv_name.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,11 +78,38 @@ public class MenuAdapter extends BaseAdapter {
             }
         });
         holder.tv_name.setClickable(true);
-        holder.chip.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        switch (node.getStatus()) {
+            case All:
+                holder.chip.setImageDrawable(context.getDrawable(R.drawable.ic_checkbox_all));
+                break;
+            case None:
+                holder.chip.setImageDrawable(context.getDrawable(R.drawable.ic_checkbox));
+                break;
+            case Part:
+                holder.chip.setImageDrawable(context.getDrawable(R.drawable.ic_checkbox_part));
+                break;
+            default:
+                break;
+        }
+        holder.chip.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            public void onClick(View v) {
+                switch (node.getStatus()) {
+                    case All:
+                        node.setStatus(ChoiceStatus.None);
+                        holder.chip.setImageDrawable(context.getDrawable(R.drawable.ic_checkbox));
+                        break;
+                    case None:
+                    case Part:
+                        holder.chip.setImageDrawable(context.getDrawable(R.drawable.ic_checkbox_all));
+                        node.setStatus(ChoiceStatus.All);
+                        break;
+                    default:
+                        break;
+                }
+
                 if (listener != null) {
-                    listener.onChoiceChanged(position, buttonView, isChecked);
+                    listener.onChoiceChanged(position, node.getStatus());
                 }
             }
         });
@@ -90,7 +118,7 @@ public class MenuAdapter extends BaseAdapter {
 
     private static class ViewHolder {
         private TextView tv_name;
-        private CheckBox chip;
+        private ImageView chip;
 
         private ViewHolder(View root) {
             this.tv_name = root.findViewById(R.id.item_name);
@@ -105,7 +133,7 @@ public class MenuAdapter extends BaseAdapter {
     }
 
     public interface OnMenuItemClickListener {
-        void onChoiceChanged(int position, CompoundButton buttonView, boolean isChecked);
+        void onChoiceChanged(int position, ChoiceStatus status);
 
         void onClick(int position, View v);
     }

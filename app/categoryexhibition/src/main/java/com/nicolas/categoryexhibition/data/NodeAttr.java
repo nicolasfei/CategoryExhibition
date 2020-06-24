@@ -4,8 +4,8 @@ import java.io.Serializable;
 
 public class NodeAttr implements Serializable {
     private static final long serialVersionUID = 2L;
-    private int id;
-    private int pid;
+    private int id;             //节点ID
+    private int pid;            //节点父ID
     private String name;
     private String imgURL;
 
